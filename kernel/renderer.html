@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" style="cursor:none;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fde</title>
+    <link rel="stylesheet" href="../fonts/loader.css">
+    <link rel="stylesheet" href="../cursors/loader.css">
+    <script>var ipcMain = require('electron').remote;</script>
+    <script src="commands.js"></script>
+</head>
+<body class="nocur" style="margin:0;background-color:black;height:100vh;overflow:hidden;">
+    <div id="fde-debugger-debug" style="z-index:99999999999999999999999999;display:none;background-color:rgba(0,0,0,.75);color:white;width:156px;position:fixed;top:0;right:0;font-size:10px;font-family:'Ubuntu Mono';">
+        fdeDebug<br><br>Heap Used: <span id="fdedd-hu">n/a</span><br>Heap Total: <span id="fdedd-ht">n/a</span><br>Shared Memory: <span id="fdedd-rs">n/a</span><br><br><a title="Open/Close Dev Tools for the main wrapper process" onclick="ipc.getCurrentWindow().toggleDevTools()" style="cursor:pointer;">Toggle Dev Tools</a><br><a title="Force reloading the main wrapper process, killing all child processes" onclick="location.reload()" style="cursor:pointer;">Reload Wrapper</a><br><br><span id="fdedd-prc"></span>
+    </div>
+    <script>
+        ipcMain.getCurrentWindow().startApp = (app) => {
+            console.log("eopn: " + app);
+        }
+    </script>
+    <style>#fde-debugger-debug,#fde-debugger-debug *{font-family:'Ubuntu Mono';}.webviews{height:100%;position: fixed;top:0;left:0;right:0;bottom:0;z-index:999999999999999;}.webviews webview {z-index:999999999999999;}#fde-debugger-debug:hover:not("> a:hover"){pointer-events:none;opacity:0;}#fde-debugger-debug details .dc{margin-left:10px;display:block;}#fde-debugger-debug{text-overflow:ellipsis;overflow:hidden;white-space:nowrap;}</style>
+    <webview class="nocur" id="wv-loader" src="../loader/main.html" webpreferences="webviewTag" nodeintegration nodeintegrationinsubframes webpreferences="width=100%" style="/*position:fixed;top:0;left:0;right:0;bottom:0;*/display:none;height:100%;"></webview>
+    <!--[if JSUC = firstboot] <webview id="wv-oobe" src="../oobe/main.html" webpreferences="webviewTag" nodeintegration nodeintegrationinsubframes style="/*position:fixed;top:0;left:0;right:0;bottom:0;*/display:none;height:100%;"></webview> [endif JSUC = firstboot]-->
+    <!--[if JSUC = login] <webview id="wv-fdm" src="../packages/fdm/main.html" webpreferences="webviewTag" nodeintegration nodeintegrationinsubframes style="/*position:fixed;top:0;left:0;right:0;bottom:0;*/display:none;height:100%;"></webview> [endif JSUC = login]-->
+    <!--[if JSUC = session] <webview id="wv-session" src="../packages/future-session/main.html" webpreferences="webviewTag" nodeintegration nodeintegrationinsubframes style="/*position:fixed;top:0;left:0;right:0;bottom:0;*/display:none;height:100%;"></webview>
+    <webview id="wv-shell" src="../packages/future-shell/main.html" webpreferences="webviewTag" nodeintegration nodeintegrationinsubframes style="/*position:fixed;top:0;left:0;right:0;bottom:0;*/display:none;height:100%;"></webview>
+    <webview id="wv-fwin" src="../packages/fwin/main.html" webpreferences="webviewTag" nodeintegration nodeintegrationinsubframes style="/*position:fixed;top:0;left:0;right:0;bottom:0;*/display:none;height:100%;"></webview> [endif JSUC = session]-->
+
+    <div id="crashscreen" style="background-color:darkblue;color:white;font-family:'Ubuntu Mono';position:fixed;top:0;left:0;right:0;bottom:0;display:none;">
+        ** STOP <span id="crashmsg" style="font-family:'Ubuntu Mono';">UNEXPECTED_CRASH</span><br>
+        ** ILLEGAL INSTRUCTION <span id="imsg" style="font-family:'Ubuntu Mono';">0x000000FF</span><br><br>
+
+        We're sorry this happened, but Future encountered a fatal error and cannot keep running with this error. We stopped Future to prevent damage to your data, software or even hardware. Please note that it is very uncommon for Future to crash.<br><br>
+
+        If this is the first time you see this screen, just restart Future or your computer. Else, contact your system administrator or Future technical support, which may help you solve your problem.<br><br>
+
+        This screen usually means a problem with Future itself or an application, but can also means a problem with your hardware. Remove all new software and hardware and retry.<br><br>
+
+        If you're a developer working on a application, you may use the debug mode instead of the classic mode. You'll have access to more technical details.
+    </div>
+
+    <script src="sandboxDebug.js"></script>
+    <script>const $ = require('jquery');</script>
+    <script>
+
+        window.onload = () => {
+            $('#wv-loader').fadeIn(200);
+            if (require('fs').existsSync("./user")) {
+                setTimeout(() => {
+                    jsuc='login';document.getElementsByTagName('body')[0].innerHTML = document.getElementsByTagName('body')[0].innerHTML.split("<!--[if JSUC = "+jsuc+"]").join("<!--[if JSUC = "+jsuc+"]/-->").split("[endif JSUC = "+jsuc+"]-->").join("<!--/[endif JSUC = "+jsuc+"]-->").trim();
+                    setTimeout(() => {
+                        $('#wv-loader').fadeOut(200);
+                        setTimeout(() => {
+                            $('#wv-fdm').fadeIn(200);
+                            document.body.classList.remove("nocur");
+                        }, 2000)
+                    }, 5000)
+                }, 5000);
+            } else {
+                setTimeout(() => {
+                    jsuc='firstboot';document.getElementsByTagName('body')[0].innerHTML = document.getElementsByTagName('body')[0].innerHTML.split("<!--[if JSUC = "+jsuc+"]").join("<!--[if JSUC = "+jsuc+"]/-->").split("[endif JSUC = "+jsuc+"]-->").join("<!--/[endif JSUC = "+jsuc+"]-->").trim();
+                    setTimeout(() => {
+                        $('#wv-loader').fadeOut(200);
+                        setTimeout(() => {
+                            $('#wv-oobe').fadeIn(200);
+                            document.body.classList.remove("nocur");
+                        }, 2000)
+                    }, 5000)
+                }, 5000);
+            }
+        }
+
+    </script>
+</body>
+</html>

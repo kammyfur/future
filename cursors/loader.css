@@ -1,0 +1,16 @@
+* {
+    /* cursor: default; */
+    cursor: url("./24/normal.png"), none;
+}
+
+.nocur, .nocur * {
+    cursor: none !important;
+}
+
+input[type="text"], input[type="password"], textarea {
+    cursor: url("./24/text.png"), none;
+}
+
+#fde-debugger-debug a {
+    cursor: url("./24/link.png"), none;
+}
